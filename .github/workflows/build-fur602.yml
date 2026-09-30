@@ -122,11 +122,14 @@ jobs:
         working-directory: openwrt
         run: |
           set -eu
-          if ! grep -q '^CONFIG_TARGET_mediatek_mt7981_DEVICE_honor_fur-602=' .config; then
-            echo "::error::CONFIG_TARGET_mediatek_mt7981_DEVICE_honor_fur-602 not set"
+          DEV_SYM="CONFIG_TARGET_DEVICE_mediatek_mt7981_DEVICE_honor_fur-602"
+          if ! grep -q "^${DEV_SYM}=" .config; then
+            echo "::error::$DEV_SYM not set"
+            echo "---- CONFIG_TARGET_* lines (diagnostic) ----"
+            grep '^CONFIG_TARGET' .config || true
             exit 1
           fi
-          echo "device honor_fur-602 selected: OK"
+          echo "device honor_fur-602 selected: OK ($DEV_SYM)"
           # 闭源 mt_wifi 驱动必须是 =y（装进固件），而不是主线 mt76
           if ! grep -q '^CONFIG_PACKAGE_kmod-mt_wifi=y' .config; then
             echo "::error::kmod-mt_wifi (closed MTK driver) not selected =y"
