@@ -130,12 +130,16 @@ jobs:
           make defconfig
           # ImmortalWrt mt798x 的 make defconfig 会把非默认 luci 主题全部静默重置掉
           # （argon / bootstrap-mod / design 都会被丢弃，只剩默认 bootstrap），且不报任何警告。
-          # 因此这里在 defconfig 之后用 scripts/config 把主题符号强制加回 .config，
-          # 之后直接 make，不再跑 defconfig。
-          scripts/config --file .config --enable PACKAGE_luci-theme-argon
-          scripts/config --file .config --enable PACKAGE_luci-theme-bootstrap-mod
-          scripts/config --file .config --enable PACKAGE_luci-theme-design
-          echo "---- luci themes after force-enable ----"
+          # 本 fork 的 scripts/config 是目录而非可执行脚本（scripts/config 命令不可用），
+          # 因此直接用 echo 把主题符号追加回 .config；追加后 .config 比 tmp 配置新，
+          # 后续 make 不会再重新 defconfig，符号会保留。
+          grep -q '^CONFIG_PACKAGE_luci-theme-argon=y' .config || \
+            echo 'CONFIG_PACKAGE_luci-theme-argon=y' >> .config
+          grep -q '^CONFIG_PACKAGE_luci-theme-bootstrap-mod=y' .config || \
+            echo 'CONFIG_PACKAGE_luci-theme-bootstrap-mod=y' >> .config
+          grep -q '^CONFIG_PACKAGE_luci-theme-design=y' .config || \
+            echo 'CONFIG_PACKAGE_luci-theme-design=y' >> .config
+          echo "---- luci themes after force-append ----"
           grep '^CONFIG_PACKAGE_luci-theme' .config || true
 
       # ---------------------------------------------------------------- #
