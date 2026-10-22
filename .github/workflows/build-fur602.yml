@@ -11,10 +11,24 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 360
     steps:
-      - name: Checkout
+      - name: Checkout upstream source
         uses: actions/checkout@v4
         with:
+          repository: hanwckf/immortalwrt-mt798x
+          ref: openwrt-21.02
           fetch-depth: 1
+
+      - name: Checkout build config
+        uses: actions/checkout@v4
+        with:
+          path: build-config
+          fetch-depth: 1
+
+      - name: Apply custom feeds & defconfig
+        run: |
+          cp -f build-config/feeds.conf.default feeds.conf.default
+          mkdir -p defconfig
+          cp -f build-config/defconfig/mt7981-fur602-ssr.config defconfig/mt7981-fur602-ssr.config
 
       - name: Install build dependencies
         run: |
