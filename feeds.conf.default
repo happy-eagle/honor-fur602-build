@@ -2,5 +2,6 @@ src-git-full packages https://github.com/immortalwrt/packages.git;openwrt-21.02
 src-git-full luci https://github.com/immortalwrt/luci.git;openwrt-21.02
 src-git-full routing https://github.com/openwrt/routing.git;openwrt-21.02
 src-git-full telephony https://github.com/openwrt/telephony.git;openwrt-21.02
-# SSR-Plus 插件源（fw876/helloworld，含 luci-app-ssr-plus 及 xray-core/shadowsocksr-libev 等全部依赖）
-src-git-full ssrplus https://github.com/fw876/helloworld.git
+# PassWall 插件源（Openwrt-Passwall 组织，含 luci-app-passwall 及全部依赖包 xray-core/sing-box/shadowsocksr-libev 等）
+src-git-full passwall_packages https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git;main
+src-git-full passwall_luci https://github.com/Openwrt-Passwall/openwrt-passwall.git;main
