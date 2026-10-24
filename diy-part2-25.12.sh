@@ -44,7 +44,7 @@ if ! grep -q "honor,fur-602" "$ONET"; then
 import sys
 path = sys.argv[1]
 txt = open(path, encoding="utf-8").read()
-block = "\n\thoner,fur-602|honor,fur-603)\n\t\tucidef_set_interfaces_lan_wan \"lan1 lan2 lan3\" wan\n\t\t;;"
+block = "\n\thonor,fur-602)\n\t\tucidef_set_interfaces_lan_wan \"lan1 lan2 lan3\" wan\n\t\t;;"
 anchor = "\tcase $board in"
 assert anchor in txt, "anchor 'case $board in' not found in 02_network"
 txt = txt.replace(anchor, anchor + block, 1)
