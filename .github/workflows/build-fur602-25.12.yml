@@ -76,7 +76,7 @@ jobs:
       - name: Collect artifacts
         run: |
           mkdir -p artifacts
-          find openwrt/bin -maxdepth 3 -type f \( -name '*honor_fur-602*' -o -name '*honor-fur-602*' \) -exec cp -v {} artifacts/ \;
+          find openwrt/bin/targets/mediatek -type f \( -name '*honor_fur-602*' -o -name '*honor-fur-602*' \) -exec cp -v {} artifacts/ \;
           ls -lh artifacts/
 
       - name: Upload artifacts
