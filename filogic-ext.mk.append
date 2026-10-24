@@ -1,0 +1,30 @@
+#
+# HONOR FUR-602 / FUR-603 (荣耀 XU50 / XT50 / XC50, 联通定制版)
+# Closed-source MTK WiFi (mt_wifi) variant for the chasey-dev 25.12 tree.
+#
+# Layout parameters are byte-for-byte the ones verified by schema12 for the
+# open-source variant AND match the bl-mt798x expand(114m) mtd layout:
+#   bl2|u-boot-env|factory|Trace|fip|ubi(116736k)
+# U-Boot boots the FIT from the UBI volume named "kernel" (KERNEL_IN_UBI=1).
+#
+define Device/honor_fur-602
+  DEVICE_VENDOR := HONOR
+  DEVICE_MODEL := FUR-602
+  DEVICE_VARIANT := (Closed-source MTK WiFi)
+  DEVICE_DTS := mt7981b-honor-fur-602
+  DEVICE_DTS_DIR := ../dts-ext
+  DEVICE_PACKAGES := kmod-mt_wifi kmod-warp mtwifi-cfg-ucode \
+	luci-app-mtwifi-cfg luci-i18n-mtwifi-cfg-zh-cn \
+	kmod-mediatek_hnat luci-app-turboacc-mtk luci-app-eqos-mtk \
+	luci-app-upnp miniupnpd
+  SUPPORTED_DEVICES := honor,fur-602 honor,fur-603
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 116736k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += honor_fur-602
