@@ -1,0 +1,87 @@
+name: Build FUR-602 firmware (25.12 closed-source mt_wifi)
+
+on:
+  workflow_dispatch:
+    inputs:
+      clean:
+        description: 'Clean build (rm -rf dl bin staging_dir)'
+        required: false
+        default: 'false'
+        type: boolean
+  push:
+    branches:
+      - openwrt-25.12
+    paths:
+      - 'mt7981b-honor-fur-602.dts'
+      - 'filogic-ext.mk.append'
+      - 'config.seed'
+      - 'diy-part2-25.12.sh'
+      - '.github/workflows/build-fur602-25.12.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source tree (chasey 25.12 closed-source)
+        uses: actions/checkout@v4
+        with:
+          repository: chasey-dev/immortalwrt-mt798x-rebase
+          ref: 25.12
+          path: openwrt
+
+      - name: Checkout config repo
+        uses: actions/checkout@v4
+        with:
+          path: config
+
+      - name: Prepare environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang flex bison g++ gawk gcc-multilib g++-multilib \
+            gettext git libncurses-dev libssl-dev python3 python3-pip python3-setuptools rsync swig \
+            unzip zip zlib1g-dev file wget curl patchelf upx-ucl
+          df -h
+
+      - name: Clean build (optional)
+        if: ${{ github.event.inputs.clean == 'true' }}
+        working-directory: openwrt
+        run: |
+          rm -rf dl bin staging_dir build_dir/target-* build_dir/hostpkg-*
+          df -h
+
+      - name: Update feeds
+        working-directory: openwrt
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Inject FUR-602 closed-source device definition
+        working-directory: openwrt
+        run: bash ../config/diy-part2-25.12.sh
+        env:
+          CONFIG_DIR: ../config
+
+      - name: Download package sources
+        working-directory: openwrt
+        run: make download -j$(nproc)
+
+      - name: Build firmware
+        working-directory: openwrt
+        run: |
+          make -j$(nproc) V=s 2>&1 | tail -n 200
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts
+          find openwrt/bin -maxdepth 3 -type f \( -name '*honor_fur-602*' -o -name '*honor-fur-602*' \) -exec cp -v {} artifacts/ \;
+          ls -lh artifacts/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fur602-25.12-closed
+          path: artifacts/
+          retention-days: 30
